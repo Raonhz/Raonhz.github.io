@@ -1,0 +1,303 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>성남 탐구 퀴즈</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=DM+Mono:wght@500&display=swap">
+<style>
+/* Layout: 한 열 카드 플로우. 맑은 블루 + 은행잎 옐로 포인트, 넓은 여백과 굵은 산세리프 */
+:root{
+  --bg:#f3f6f9; --surface:#ffffff; --surface-2:#eaf0f6; --fg:#0f161e; --muted:#63707e; --line:#dde6ef;
+  --accent:#0a66d8; --accent-ink:#ffffff; --ginkgo:#f2c230;
+  --good:#12935a; --good-soft:#e2f5ec; --bad:#d6413a; --bad-soft:#fbe6e4;
+  --shadow:0 1px 2px rgba(15,22,30,.04),0 8px 24px rgba(15,22,30,.06);
+  --sans:"Noto Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif;
+  --mono:"DM Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0a1118; --surface:#131b25; --surface-2:#1a2532; --fg:#edf2f7; --muted:#8e9db0; --line:#23303e;
+  --accent:#4aa3ff; --accent-ink:#0a1118; --ginkgo:#f5cd4a;
+  --good:#3fcf8e; --good-soft:#15291f; --bad:#ff7a70; --bad-soft:#331a1a;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0a1118; --surface:#131b25; --surface-2:#1a2532; --fg:#edf2f7; --muted:#8e9db0; --line:#23303e;
+  --accent:#4aa3ff; --accent-ink:#0a1118; --ginkgo:#f5cd4a;
+  --good:#3fcf8e; --good-soft:#15291f; --bad:#ff7a70; --bad-soft:#331a1a;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25); color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:16px;line-height:1.6;padding-inline:16px;padding-block:28px 56px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:12px}
+
+/* home */
+.brand{display:flex;align-items:center;gap:10px;font-size:.8rem;font-weight:700;letter-spacing:.06em;color:var(--muted)}
+.leaf{width:22px;height:22px;flex:none}
+h1{font-size:clamp(2.2rem,9vw,3.2rem);font-weight:900;letter-spacing:-.04em;line-height:1.08;margin:0;text-wrap:balance}
+h1 em{font-style:normal;background:linear-gradient(transparent 62%,var(--ginkgo) 62% 92%,transparent 92%)}
+.lead{color:var(--muted);margin:0;max-width:34ch}
+.levels{display:grid;gap:12px}
+.lv{all:unset;box-sizing:border-box;cursor:pointer;background:var(--surface);border-radius:20px;padding:20px;display:grid;grid-template-columns:1fr auto;gap:4px 16px;align-items:center;box-shadow:var(--shadow);transition:transform .15s ease}
+.lv:hover{transform:translateY(-2px)}
+.lv .tag{grid-column:1/-1;display:flex;align-items:center;gap:8px;font-size:.78rem;font-weight:700;color:var(--accent)}
+.dots{display:inline-flex;gap:3px}
+.dots i{width:7px;height:7px;border-radius:50%;background:var(--surface-2)}
+.dots i.on{background:var(--accent)}
+.lv b{font-size:1.15rem;font-weight:700;letter-spacing:-.02em;min-width:0}
+.lv small{grid-column:1;color:var(--muted);font-size:.88rem}
+.lv .go{grid-row:2/4;grid-column:2;width:44px;height:44px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-size:1.1rem}
+.lv:hover .go{background:var(--accent);color:var(--accent-ink)}
+.best{grid-column:1/-1;margin-top:10px;padding-top:12px;border-top:1px solid var(--line);font-size:.85rem;color:var(--muted);display:flex;justify-content:space-between;gap:12px;font-variant-numeric:tabular-nums}
+.best span:last-child{color:var(--fg)}
+
+/* quiz */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.icon-btn{all:unset;cursor:pointer;width:40px;height:40px;border-radius:50%;background:var(--surface);display:grid;place-items:center;box-shadow:var(--shadow);font-size:1.1rem}
+.count{font-variant-numeric:tabular-nums;font-size:.9rem;color:var(--muted)}
+.count b{color:var(--fg);font-weight:500}
+.chip{font-size:.8rem;font-weight:700;background:var(--surface);padding:8px 12px;border-radius:999px;box-shadow:var(--shadow);font-variant-numeric:tabular-nums}
+.chip::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ginkgo);margin-right:6px}
+.bar{height:6px;background:var(--surface-2);border-radius:999px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:999px;transition:width .35s ease}
+.card{background:var(--surface);border-radius:24px;padding:28px 22px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:22px;animation:rise .3s ease}
+@keyframes rise{from{transform:translateY(8px);opacity:.4}to{transform:none;opacity:1}}
+.qlabel{font-size:.78rem;font-weight:700;color:var(--accent);letter-spacing:.04em}
+.q{font-size:clamp(1.3rem,5.4vw,1.6rem);font-weight:700;letter-spacing:-.03em;line-height:1.4;margin:0;text-wrap:pretty}
+.opts{display:grid;gap:10px}
+.opt{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:16px;background:var(--surface-2);font-weight:500;font-size:1.05rem;border:2px solid transparent;transition:border-color .15s,background .15s}
+.opt span{flex:none;width:32px;height:32px;border-radius:10px;background:var(--surface);display:grid;place-items:center;font-family:var(--mono);font-size:.85rem;color:var(--muted)}
+.opt:hover:not([disabled]){border-color:var(--accent)}
+.opt[disabled]{cursor:default;outline:none}
+.opt.ok{background:var(--good-soft);border-color:var(--good)}
+.opt.ok span{background:var(--good);color:var(--surface)}
+.opt.no{background:var(--bad-soft);border-color:var(--bad)}
+.opt.no span{background:var(--bad);color:var(--surface)}
+.opt.dim{opacity:.45}
+.feedback{border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:6px;animation:rise .25s ease}
+.feedback.ok{background:var(--good-soft)}
+.feedback.no{background:var(--bad-soft)}
+.feedback b{font-size:1.05rem}
+.feedback.ok b{color:var(--good)}
+.feedback.no b{color:var(--bad)}
+.feedback p{margin:0}
+.btn{all:unset;box-sizing:border-box;cursor:pointer;background:var(--accent);color:var(--accent-ink);font-weight:700;padding:16px 22px;border-radius:16px;text-align:center;width:100%}
+.btn.ghost{background:var(--surface);color:var(--fg);box-shadow:var(--shadow)}
+
+/* result */
+.result{background:var(--surface);border-radius:24px;padding:32px 22px;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+.ring{width:150px;height:150px}
+.ring text{font-family:var(--mono)}
+.result h2{margin:0;font-size:1.4rem;font-weight:900;letter-spacing:-.03em;text-wrap:balance}
+.result p{margin:0;color:var(--muted)}
+.actions{display:grid;gap:10px}
+.section-title{font-size:1rem;font-weight:700;margin:8px 0 0;display:flex;align-items:center;gap:8px}
+.section-title span{font-variant-numeric:tabular-nums;font-size:.8rem;background:var(--bad-soft);color:var(--bad);padding:2px 8px;border-radius:999px}
+.wrong{display:grid;gap:10px}
+.wrong div{background:var(--surface);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+.wrong b{display:block;font-weight:700;letter-spacing:-.01em}
+.wrong p{margin:6px 0 0;font-size:.92rem;color:var(--muted)}
+.wrong p strong{color:var(--good)}
+.perfect{text-align:center;color:var(--muted);margin:0}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<style>
+/* 단독 실행용 기본값 */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html,body{margin:0;min-height:100%}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+img,svg{max-width:100%}
+[hidden]{display:none!important}
+body{overflow-x:hidden}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+const LEVELS=[
+{name:"쉬움 · 우리 고장 성남",desc:"3학년 사회 · 고장의 상징과 장소",qs:[
+["성남시는 어느 도에 있을까요?",["경기도","제주도","강원도","울릉도"],0,"성남시는 경기도에 있어요."],
+["성남시를 대표하는 새는?",["까치","펭귄","타조","앵무새"],0,"성남시의 새는 반가운 소식을 전하는 까치예요."],
+["성남시를 대표하는 꽃은?",["철쭉","선인장꽃","연꽃","튤립"],0,"봄에 분홍빛으로 피는 철쭉이에요."],
+["성남시를 대표하는 나무는?",["은행나무","야자나무","대나무","바오바브나무"],0,"가을에 노랗게 물드는 은행나무예요."],
+["새, 꽃, 나무처럼 고장을 나타내는 것을 무엇이라고 할까요?",["고장의 상징","고장의 숙제","고장의 날씨","고장의 장난감"],0,"고장의 특징을 담아 정한 것을 상징이라고 해요."],
+["성남 가운데를 흐르는 하천 이름은?",["탄천","아마존강","나일강","한라천"],0,"탄천 옆에는 산책길과 자전거길이 있어요."],
+["성남 옆에 있는 크고 오래된 성은?",["남한산성","만리장성","에펠탑","피라미드"],0,"남한산성은 우리나라의 소중한 문화유산이에요."],
+["'성남'이라는 이름은 어디서 왔을까요?",["남한산성의 남쪽","바다의 남쪽","달의 남쪽","남극"],0,"남한산성 남쪽에 있는 고장이라서 성남이에요."],
+["'판교'는 무슨 다리라는 뜻일까요?",["나무판자 다리","무지개 다리","구름 다리","얼음 다리"],0,"판(板)은 널빤지, 교(橋)는 다리예요."],
+["'탄천'을 우리말로 부르던 이름은?",["숯내","꿀내","별내","눈내"],0,"탄(炭)은 숯이라는 뜻이에요."],
+["땅 이름이 생긴 까닭을 무엇이라고 할까요?",["지명 유래","일기 예보","구구단","받아쓰기"],0,"'성남', '판교'처럼 이름이 생긴 까닭이에요."],
+["성남에서 5일마다 열리는 유명한 시장은?",["모란시장","자갈치시장","우주시장","바다시장"],0,"모란시장은 아주 큰 5일장이에요."],
+["성남에는 구가 몇 개 있을까요?",["3개","30개","100개","0개"],0,"수정구, 중원구, 분당구 3개예요."],
+["다음 중 성남에 있는 구는?",["분당구","해운대구","제주구","남극구"],0,"분당구는 성남시의 구예요."],
+["성남시 일을 맡아 하는 곳은?",["성남시청","놀이공원","수영장","빵집"],0,"시청에서 성남 시민을 위한 일을 해요."],
+["성남의 프로축구팀 이름은?",["성남FC","제주FC","바다FC","우주FC"],0,"성남FC는 성남을 대표하는 축구팀이에요."],
+["번지점프대가 있는 분당의 공원은?",["율동공원","에버랜드","롯데월드","동물원"],0,"율동공원 호숫가에 번지점프대가 있어요."],
+["여러 직업을 체험해 볼 수 있는 성남의 체험관은?",["한국잡월드","수족관","동물원","놀이터"],0,"소방관, 요리사 같은 직업을 체험할 수 있어요."],
+["회사가 많이 모여 있는 성남의 동네는?",["판교","남극","사막","무인도"],0,"판교에는 게임, 인터넷 회사가 많아요."],
+["성남 북쪽에 붙어 있는 큰 도시는?",["서울","부산","제주","울산"],0,"성남 바로 위쪽이 서울이에요."],
+["성남 남쪽에 붙어 있는 이웃 도시는?",["용인","부산","목포","제주"],0,"성남 아래쪽에 용인이 있어요."],
+["우리 고장의 모습을 하늘에서 내려다보듯 볼 수 있는 것은?",["디지털 영상 지도","달력","공책","시계"],0,"디지털 영상 지도로 우리 고장을 위에서 볼 수 있어요."],
+["우리 고장에서 내가 좋아하는 장소를 소개하는 방법은?",["그림 지도 그리기","숨기기","지우기","잊어버리기"],0,"그림 지도로 좋아하는 장소를 나타낼 수 있어요."],
+["성남에서 책을 빌려 볼 수 있는 곳은?",["도서관","주유소","세탁소","미용실"],0,"성남에는 여러 시립 도서관이 있어요."],
+["성남FC가 경기하는 경기장 이름은?",["탄천종합운동장","바다경기장","우주경기장","얼음경기장"],0,"탄천 옆에 있는 경기장이에요."],
+["까치는 어떤 소식을 전한다고 알려진 새일까요?",["반가운 소식","무서운 소식","슬픈 소식","아무 소식도 없음"],0,"아침에 까치가 울면 반가운 손님이 온다는 말이 있어요."],
+["분당 한가운데 있는 큰 공원 이름은?",["중앙공원","바다공원","우주공원","사막공원"],0,"분당 중앙공원은 이름처럼 가운데 있어요."],
+["성남에서 지하철을 탈 수 있을까요?",["탈 수 있다","탈 수 없다","배만 탄다","비행기만 탄다"],0,"8호선, 신분당선, 수인분당선이 다녀요."],
+["성남에는 대략 몇 명이 살까요?",["약 90만 명","약 9명","약 90명","약 900명"],0,"약 90만 명이 사는 큰 도시예요."],
+["조상이 남긴 소중한 남한산성 같은 것을 무엇이라고 할까요?",["문화유산","쓰레기","장난감","숙제"],0,"남한산성은 우리 고장 가까이 있는 문화유산이에요."]
+]},
+{name:"중간 · 도시와 촌락",desc:"3·4학년 사회 · 도시, 농촌, 어촌, 산지촌",qs:[
+["성남은 도시일까요, 촌락일까요?",["도시","어촌","산지촌","농촌"],0,"성남은 건물과 사람이 많은 도시예요."],
+["도시의 모습으로 알맞은 것은?",["높은 건물이 많다","논밭만 있다","바다만 있다","사람이 아무도 없다"],0,"도시에는 높은 건물과 가게가 많아요."],
+["논과 밭이 많고 농사를 짓는 마을은?",["농촌","어촌","도시","산지촌"],0,"농사짓는 마을을 농촌이라고 해요."],
+["바닷가에서 고기를 잡으며 사는 마을은?",["어촌","농촌","도시","산지촌"],0,"바닷가 마을을 어촌이라고 해요."],
+["산에서 나물을 캐고 버섯을 기르며 사는 마을은?",["산지촌","어촌","도시","농촌"],0,"산에 있는 마을을 산지촌이라고 해요."],
+["농촌, 어촌, 산지촌을 함께 부르는 말은?",["촌락","도시","나라","학교"],0,"도시가 아닌 마을들을 촌락이라고 해요."],
+["도시에서 많이 볼 수 있는 것은?",["지하철과 버스","고기잡이배","계단식 논","양떼 목장"],0,"성남에도 지하철과 버스가 많이 다녀요."],
+["어촌에서 많이 볼 수 있는 것은?",["고기잡이배","지하철","높은 빌딩","백화점"],0,"어촌에는 배와 그물이 많아요."],
+["농촌에서 많이 볼 수 있는 것은?",["논과 밭","지하철","큰 백화점","공항"],0,"농촌에서는 벼와 채소를 길러요."],
+["도시 사람들이 하는 일로 알맞은 것은?",["회사나 가게에서 일하기","바다에서 고기잡기","산에서 약초 캐기","논에서 모내기"],0,"성남 사람들은 회사, 가게, 병원 등에서 많이 일해요."],
+["도시에 사람이 많아서 생기는 문제는?",["길이 막힌다","바닷물이 넘친다","화산이 터진다","눈이 안 녹는다"],0,"출퇴근 시간에 차가 많아 길이 막혀요."],
+["도시의 교통 문제를 줄이는 방법은?",["버스와 지하철 이용하기","자동차 더 많이 타기","길 막기","신호 무시하기"],0,"대중교통을 타면 길에 차가 줄어요."],
+["도시에 쓰레기가 많아지는 문제를 줄이는 방법은?",["분리배출하기","아무 데나 버리기","쓰레기 더 만들기","강에 버리기"],0,"분리배출을 하면 다시 쓸 수 있는 것도 많아요."],
+["촌락에서 생기기 쉬운 문제는?",["일할 사람이 부족하다","지하철이 너무 많다","빌딩이 너무 높다","차가 너무 막힌다"],0,"젊은 사람들이 도시로 떠나 일손이 부족해요."],
+["도시와 촌락이 서로 돕는 모습은?",["촌락의 쌀을 도시 사람이 사 먹는다","서로 모른 척한다","서로 싸운다","길을 막는다"],0,"도시와 촌락은 필요한 것을 서로 주고받아요."],
+["도시 사람이 촌락에서 할 수 있는 체험은?",["농사 체험","지하철 타기","백화점 쇼핑","빌딩 구경"],0,"촌락에서 딸기 따기, 모내기 같은 체험을 해요."],
+["촌락 사람이 도시에서 이용하기 좋은 곳은?",["큰 병원","논","어장","목장"],0,"도시에는 큰 병원과 공연장이 많아요."],
+["분당이나 판교처럼 새로 계획해서 만든 도시는?",["신도시","옛도시","섬마을","산마을"],0,"분당과 판교는 새로 만든 신도시예요."],
+["옛날 성남은 어떤 모습이었을까요?",["논밭과 산이 많았다","높은 빌딩이 가득했다","지하철이 많았다","백화점이 많았다"],0,"옛날 성남은 논밭과 산이 많은 시골이었어요."],
+["시골이던 성남은 지금 어떻게 변했을까요?",["큰 도시가 되었다","바다가 되었다","사막이 되었다","사람이 사라졌다"],0,"지금은 약 90만 명이 사는 도시예요."],
+["옛날과 오늘날 교통수단을 바르게 짝지은 것은?",["가마 - 지하철","지하철 - 가마","비행기 - 가마","버스 - 가마"],0,"옛날엔 가마를 탔고, 오늘날엔 지하철을 타요."],
+["옛날에 소식을 멀리 전하던 방법은?",["봉수(불과 연기)","스마트폰","이메일","영상 통화"],0,"산 위에서 불과 연기로 소식을 전했어요."],
+["오늘날 소식을 빠르게 전하는 방법은?",["스마트폰","봉수","파발","편지 비둘기"],0,"스마트폰으로 바로 연락할 수 있어요."],
+["탄천을 깨끗하게 하는 행동은?",["쓰레기 줍기","쓰레기 버리기","비닐 던지기","물 더럽히기"],0,"작은 쓰레기 줍기가 하천을 지켜요."],
+["성남의 옛 모습을 알아보는 방법은?",["옛날 사진 보기","내일 날씨 보기","게임하기","낮잠 자기"],0,"옛날 사진이나 어르신 이야기로 알 수 있어요."],
+["눈이 많이 오는 산골 마을에서 볼 수 있는 것은?",["눈을 치우는 도구","야자수","사막 낙타","바다 등대"],0,"사는 곳의 환경에 따라 생활 모습이 달라요."],
+["바닷가 마을 사람들이 많이 먹는 음식은?",["생선과 해산물","선인장","눈사람","모래"],0,"바다에서 잡은 것을 많이 먹어요."],
+["사는 곳의 날씨나 땅 모양에 따라 달라지는 것은?",["생활 모습","내 이름","요일","구구단"],0,"환경에 따라 집, 옷, 음식, 하는 일이 달라요."],
+["도시 사람과 촌락 사람이 함께 행복하려면?",["서로 돕고 교류한다","서로 미워한다","한쪽만 산다","길을 끊는다"],0,"서로 필요한 것을 나누면 모두 좋아요."],
+["성남처럼 사람이 많은 도시에서 꼭 필요한 시설은?",["학교와 병원","고기잡이 항구","계단식 논","양떼 목장"],0,"사람이 많으니 학교와 병원이 많이 필요해요."]
+]},
+{name:"고급 · 특산물과 고장 생활",desc:"4학년 사회 · 특산물, 시장, 공공기관, 지도",qs:[
+["고장에서 특히 많이 나거나 유명한 물건을 무엇이라고 할까요?",["특산물","쓰레기","장난감","숙제"],0,"그 고장의 자랑거리인 물건을 특산물이라고 해요."],
+["제주도의 대표 특산물은?",["감귤","얼음","선인장","모래"],0,"따뜻한 제주도에서는 감귤이 잘 자라요."],
+["경기도 이천의 대표 특산물은?",["쌀","바나나","파인애플","코코넛"],0,"이천 쌀은 맛있기로 유명해요."],
+["전라남도 보성의 대표 특산물은?",["녹차","망고","얼음","사과 주스"],0,"보성에는 넓은 녹차밭이 있어요."],
+["경상북도 영덕의 대표 특산물은?",["대게","귤","녹차","인삼"],0,"바닷가 영덕은 대게가 유명해요."],
+["충청남도 금산의 대표 특산물은?",["인삼","바나나","오징어","감귤"],0,"금산 인삼은 아주 유명해요."],
+["바닷가 고장에서 많이 나는 특산물은?",["해산물","사과","인삼","녹차"],0,"바다에서 생선, 미역, 김 같은 것이 나요."],
+["고장마다 특산물이 다른 까닭은?",["날씨와 땅이 달라서","이름이 달라서","요일이 달라서","색깔이 달라서"],0,"날씨, 땅, 바다나 산 같은 환경이 달라서예요."],
+["성남은 논밭보다 회사가 많아요. 성남에서 많이 만드는 것은?",["게임과 앱 같은 기술","귤","대게","녹차"],0,"판교에서는 게임, 인터넷 같은 기술을 많이 만들어요."],
+["성남 사람들이 이천 쌀을 사 먹고, 이천 사람들이 성남에서 만든 게임을 하는 것은?",["경제 교류","혼자 살기","싸움","숙제"],0,"지역끼리 필요한 것을 주고받는 것을 경제 교류라고 해요."],
+["모란시장 5일장은 어떤 시장일까요?",["5일마다 열리는 시장","5분만 여는 시장","5명만 오는 시장","문을 안 여는 시장"],0,"모란시장은 5일마다 열리는 전통 시장이에요."],
+["모란시장 같은 시장에서 하는 일은?",["물건을 사고판다","잠을 잔다","수업을 듣는다","비행기를 탄다"],0,"시장에서는 여러 고장의 물건을 사고팔아요."],
+["필요한 물건을 만드는 것을 무엇이라고 할까요?",["생산","잠","놀이","청소"],0,"물건이나 서비스를 만드는 일을 생산이라고 해요."],
+["돈을 내고 필요한 물건을 사서 쓰는 것을 무엇이라고 할까요?",["소비","생산","청소","잠"],0,"물건을 사서 쓰는 것을 소비라고 해요."],
+["농부가 쌀을 기르는 것은 생산일까요, 소비일까요?",["생산","소비","잠","놀이"],0,"쌀을 기르는 것은 생산이에요."],
+["돈은 정해져 있는데 사고 싶은 것은 많을 때 어떻게 할까요?",["꼭 필요한 것부터 고른다","다 산다","아무거나 산다","남의 것을 가져온다"],0,"꼭 필요한 것부터 고르는 것이 현명한 선택이에요."],
+["불이 났을 때 도와주는 곳은?",["소방서","빵집","문구점","놀이터"],0,"소방관이 불을 꺼 줘요. 전화는 119예요."],
+["불이 나면 몇 번에 전화할까요?",["119","112","114","777"],0,"불이 나거나 다치면 119예요."],
+["예방 주사를 맞을 수 있는 공공기관은?",["보건소","영화관","서점","편의점"],0,"보건소는 주민의 건강을 돌봐요."],
+["다음 중 공공기관이 아닌 것은?",["백화점","소방서","경찰서","보건소"],0,"백화점은 물건을 파는 가게예요."],
+["시청이 있어 고장의 일을 처리하는 곳은 어떤 중심지일까요?",["행정 중심지","놀이 중심지","잠자는 중심지","바다 중심지"],0,"시청, 구청이 있는 곳은 행정 중심지예요."],
+["지하철과 버스가 많이 모이는 곳은 어떤 중심지일까요?",["교통 중심지","행정 중심지","농사 중심지","바다 중심지"],0,"모란역, 야탑역처럼 교통수단이 모이는 곳이에요."],
+["가게와 백화점이 많이 모인 곳은 어떤 중심지일까요?",["상업 중심지","행정 중심지","교통 중심지","농사 중심지"],0,"물건을 사고파는 곳은 상업 중심지예요."],
+["지도에서 보통 위쪽은 어느 방향일까요?",["북쪽","남쪽","아래쪽","땅속"],0,"지도는 보통 위쪽이 북쪽이에요."],
+["지도에서 하천은 보통 무슨 색일까요?",["파란색","빨간색","검은색","분홍색"],0,"물은 파란색으로 나타내요."],
+["지도에서 학교를 나타내는 기호는?",["文","♥","★","☺"],0,"글월 문(文) 자로 학교를 나타내요."],
+["지도에서 산처럼 높은 곳은 보통 무슨 색일까요?",["갈색","파란색","분홍색","보라색"],0,"높은 곳은 갈색, 낮은 곳은 초록색이에요."],
+["남한산성에서 해도 되는 행동은?",["정해진 길로 걷기","성벽에 낙서하기","돌 빼 가기","쓰레기 버리기"],0,"문화유산은 아끼고 보호해야 해요."],
+["우리 동네 문제를 고치려고 의견을 내는 것은?",["주민 참여","모른 척하기","화내기","도망가기"],0,"주민들이 함께 의견을 내는 것을 주민 참여라고 해요."],
+["특산물을 알리려고 고장에서 여는 행사는?",["지역 축제","시험","대청소","받아쓰기"],0,"보성 녹차 축제, 이천 쌀 문화 축제처럼 축제로 특산물을 알려요."]
+]}
+];
+
+const app=document.getElementById('app');
+const L="1234";
+const DIFF=[1,2,3];
+let st=null;
+const KEY='sn-34-best';
+function getBest(i){try{return JSON.parse(localStorage.getItem(KEY)||'{}')[i]}catch(e){return undefined}}
+function setBest(i,v){try{const b=JSON.parse(localStorage.getItem(KEY)||'{}');if(b[i]===undefined||v>b[i]){b[i]=v;localStorage.setItem(KEY,JSON.stringify(b))}}catch(e){}}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const leaf=`<svg class="leaf" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21v-6" stroke="var(--fg)" stroke-width="1.6" stroke-linecap="round" fill="none"/><path d="M12 15C7 15 3 11 3 6c3-1 6 0 9 3 3-3 6-4 9-3 0 5-4 9-9 9z" fill="var(--ginkgo)"/><path d="M12 9v6" stroke="var(--bg)" stroke-width="1.2"/></svg>`;
+const part=(s,i)=>s.split(' · ')[i];
+
+function home(){
+  st=null;
+  app.innerHTML=`<div class="brand">${leaf}<span>경기도 성남시 · 초등 3·4학년 사회</span></div>
+  <h1>우리 고장 <em>성남</em><br>탐구 퀴즈</h1>
+  <p class="lead">단계마다 30문제. 답을 고르면 바로 해설이 나오고, 풀 때마다 순서가 바뀌어요.</p>
+  <div class="levels">${LEVELS.map((l,i)=>{const b=getBest(i);return `<button class="lv" data-i="${i}" aria-label="${esc(l.name)} 시작">
+    <span class="tag"><span class="dots">${[0,1,2].map(k=>`<i class="${k<DIFF[i]?'on':''}"></i>`).join('')}</span>${esc(part(l.name,0))}</span>
+    <b>${esc(part(l.name,1))}</b><span class="go" aria-hidden="true">→</span>
+    <small>${esc(l.desc)}</small>
+    <span class="best"><span>30문제</span><span>${b===undefined?'아직 안 풀었어요':'최고 '+b+' / 30'}</span></span></button>`}).join('')}</div>`;
+  app.querySelectorAll('.lv').forEach(b=>b.onclick=()=>start(+b.dataset.i));
+  window.scrollTo(0,0);
+}
+function start(i){
+  st={lv:i,qs:shuffle(LEVELS[i].qs).map(q=>{const order=shuffle([0,1,2,3]);return{q:q[0],o:order.map(k=>q[1][k]),a:order.indexOf(q[2]),e:q[3]}}),n:0,score:0,wrong:[]};
+  show();
+}
+function show(){
+  const q=st.qs[st.n],t=st.qs.length;
+  app.innerHTML=`<div class="top"><button class="icon-btn" id="quit" aria-label="단계 선택으로">←</button>
+    <span class="count"><b>${String(st.n+1).padStart(2,'0')}</b> / ${t}</span>
+    <span class="chip">${st.score}점</span></div>
+  <div class="bar" role="progressbar" aria-valuenow="${st.n}" aria-valuemax="${t}"><i style="width:${st.n/t*100}%"></i></div>
+  <div class="card">
+    <span class="qlabel">${esc(part(LEVELS[st.lv].name,0))} · ${esc(part(LEVELS[st.lv].name,1))}</span>
+    <p class="q">${esc(q.q)}</p>
+    <div class="opts">${q.o.map((o,k)=>`<button class="opt" data-k="${k}"><span>${L[k]}</span>${esc(o)}</button>`).join('')}</div>
+    <div id="after" class="actions"></div>
+  </div>`;
+  document.getElementById('quit').onclick=home;
+  app.querySelectorAll('.opt').forEach(b=>b.onclick=()=>pick(+b.dataset.k));
+  window.scrollTo(0,0);
+}
+function pick(k){
+  const q=st.qs[st.n],btns=app.querySelectorAll('.opt'),right=k===q.a;
+  btns.forEach((b,i)=>{b.disabled=true;if(i===q.a)b.classList.add('ok');else if(i===k)b.classList.add('no');else b.classList.add('dim')});
+  if(right)st.score++;else st.wrong.push({q:q.q,a:q.o[q.a],e:q.e});
+  app.querySelector('.chip').textContent=st.score+'점';
+  const last=st.n===st.qs.length-1;
+  document.getElementById('after').innerHTML=`<div class="feedback ${right?'ok':'no'}"><b>${right?'정답이에요!':'아쉬워요. 정답은 '+esc(q.o[q.a])}</b><p>${esc(q.e)}</p></div>
+    <button class="btn" id="next">${last?'결과 보기':'다음 문제 →'}</button>`;
+  const nx=document.getElementById('next');nx.focus({preventScroll:true});
+  nx.scrollIntoView({block:'nearest',behavior:'smooth'});
+  nx.onclick=()=>{if(last)result();else{st.n++;show()}};
+}
+function result(){
+  setBest(st.lv,st.score);
+  const s=st.score,lv=st.lv,pct=s/30,C=2*Math.PI*62;
+  const msg=s>=27?'와! 성남 박사예요':s>=20?'성남을 정말 잘 알아요':s>=12?'잘했어요! 조금만 더 해 봐요':'해설을 읽고 다시 도전해요';
+  app.innerHTML=`<div class="top"><button class="icon-btn" id="home2" aria-label="단계 선택으로">←</button><span class="count">${esc(LEVELS[lv].name)}</span><span></span></div>
+  <div class="result">
+    <svg class="ring" viewBox="0 0 150 150" role="img" aria-label="30문제 중 ${s}문제 정답">
+      <circle cx="75" cy="75" r="62" fill="none" stroke="var(--surface-2)" stroke-width="12"/>
+      <circle cx="75" cy="75" r="62" fill="none" stroke="var(--accent)" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C*pct} ${C}" transform="rotate(-90 75 75)"/>
+      <text x="75" y="82" text-anchor="middle" font-size="34" fill="var(--fg)">${s}</text>
+      <text x="75" y="104" text-anchor="middle" font-size="13" fill="var(--muted)">/ 30</text>
+    </svg>
+    <h2>${msg}</h2><p>${st.wrong.length?'틀린 문제 '+st.wrong.length+'개를 아래에서 다시 볼 수 있어요.':'30문제를 모두 맞혔어요!'}</p>
+  </div>
+  <div class="actions">${lv<2?'<button class="btn" id="nextlv">다음 단계 도전 →</button>':''}<button class="btn ${lv<2?'ghost':''}" id="again">다시 풀기</button>${lv<2?'':'<button class="btn ghost" id="home">처음으로</button>'}</div>
+  ${st.wrong.length?`<p class="section-title">오답 노트 <span>${st.wrong.length}</span></p><div class="wrong">${st.wrong.map(w=>`<div><b>${esc(w.q)}</b><p><strong>${esc(w.a)}</strong> · ${esc(w.e)}</p></div>`).join('')}</div>`:''}`;
+  document.getElementById('again').onclick=()=>start(lv);
+  document.getElementById('home2').onclick=home;
+  const h=document.getElementById('home');if(h)h.onclick=home;
+  const n=document.getElementById('nextlv');if(n)n.onclick=()=>start(lv+1);
+  window.scrollTo(0,0);
+}
+home();
+</script>
+<noscript><p style="padding:16px">이 퀴즈는 자바스크립트가 켜져 있어야 동작해요.</p></noscript>
+</body>
+</html>
